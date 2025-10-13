@@ -72,8 +72,7 @@ public class User implements Serializable {
     @TableLogic // 逻辑删除
     private Integer isDelete;
 
-    @TableField(exist = false) // 不映射数据库字段
-
+    @TableField(exist = false) // 告诉 MyBatis-Plus 忽略这个字段，不参与数据库操作。
     private static final long serialVersionUID = 1L; // 序列化版本号
 
 }
