@@ -12,7 +12,7 @@ import java.util.List;
  * 图片查询请求（支持分页）
  *
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true) // 继承父类的equals和hashCode方法
 @Data
 public class PictureQueryRequest extends PageRequest implements Serializable {
   
@@ -74,7 +74,23 @@ public class PictureQueryRequest extends PageRequest implements Serializable {
     /**  
      * 用户 id  
      */  
-    private Long userId;  
-  
+    private Long userId;
+
+    /**
+     * 状态：0-待审核; 1-通过; 2-拒绝
+     */
+    private Integer reviewStatus;
+
+    /**
+     * 审核信息
+     */
+    private String reviewMessage;
+
+    /**
+     * 审核人 id
+     */
+    private Long reviewerId;
+
+
     private static final long serialVersionUID = 1L;  
 }
