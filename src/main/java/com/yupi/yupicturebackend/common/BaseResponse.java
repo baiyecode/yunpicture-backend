@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 public class BaseResponse<T> implements Serializable {
 
-    private int code;
+    private int code;//状态码
 
     private T data;
 
