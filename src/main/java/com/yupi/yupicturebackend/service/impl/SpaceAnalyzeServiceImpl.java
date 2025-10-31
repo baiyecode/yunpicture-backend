@@ -96,8 +96,9 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
 
+            //已改为使用sa-token注解鉴权
             // 权限校验：仅空间所有者或管理员可访问
-            spaceService.checkSpaceAuth(loginUser, space);
+            //spaceService.checkSpaceAuth(loginUser, space);
 
             // 构造返回结果
             SpaceUsageAnalyzeResponse response = new SpaceUsageAnalyzeResponse();
@@ -345,7 +346,8 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
             ThrowUtils.throwIf(spaceId == null || spaceId <= 0, ErrorCode.PARAMS_ERROR);
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-            spaceService.checkSpaceAuth(loginUser, space);
+            //已改为使用sa-token注解鉴权
+            //spaceService.checkSpaceAuth(loginUser, space);
         }
     }
 
