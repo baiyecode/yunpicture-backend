@@ -49,7 +49,7 @@ public class PictureEditEventProducer {
      * 优雅停机
      */
     @PreDestroy //当 Spring 容器关闭，即将销毁 PictureEditEventProducer Bean 之前，会自动调用被 @PreDestroy 标记的方法。这是一种优雅停机的实践。
-    public void close() {
+    public void destroy() {
         pictureEditEventDisruptor.shutdown();
         //调用 Disruptor 实例的 shutdown 方法。这个方法会：
         //等待所有已发布到 RingBuffer 的事件被消费者处理完毕。

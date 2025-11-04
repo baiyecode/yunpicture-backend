@@ -64,7 +64,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
             }
             // 校验用户是否有该图片的权限
             Picture picture = pictureService.getById(pictureId);
-            if (picture == null) {
+            if (ObjUtil.isEmpty(picture)) {
                 log.error("图片不存在，拒绝握手");
                 return false;
             }
@@ -72,7 +72,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
             Space space = null;
             if (spaceId != null) {
                 space = spaceService.getById(spaceId);
-                if (space == null) {
+                if (ObjUtil.isEmpty(space)) {
                     log.error("空间不存在，拒绝握手");
                     return false;
                 }

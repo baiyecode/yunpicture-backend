@@ -41,7 +41,7 @@ public class PictureEditEventWorkHandler implements WorkHandler<PictureEditEvent
         Long pictureId = event.getPictureId();
         // 获取到消息类别
         String type = pictureEditRequestMessage.getType();
-        PictureEditMessageTypeEnum pictureEditMessageTypeEnum = PictureEditMessageTypeEnum.valueOf(type);
+        PictureEditMessageTypeEnum pictureEditMessageTypeEnum = PictureEditMessageTypeEnum.getEnumByValue(type);
         // 调用对应的消息处理方法
         switch (pictureEditMessageTypeEnum) {
             case ENTER_EDIT:
@@ -59,6 +59,7 @@ public class PictureEditEventWorkHandler implements WorkHandler<PictureEditEvent
                 pictureEditResponseMessage.setMessage("消息类型错误");
                 pictureEditResponseMessage.setUser(userService.getUserVO(user));
                 session.sendMessage(new TextMessage(JSONUtil.toJsonStr(pictureEditResponseMessage)));
+                break;
         }
     }
 }
