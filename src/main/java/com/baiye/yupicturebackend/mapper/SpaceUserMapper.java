@@ -1,0 +1,18 @@
+package com.baiye.yupicturebackend.mapper;
+
+import com.baiye.yupicturebackend.model.entity.SpaceUser;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+* @author Admin
+* @description 针对表【space_user(空间用户关联)】的数据库操作Mapper
+* @createDate 2025-10-28 15:41:15
+* @Entity com.baiye.yupicturebackend.model.entity.SpaceUser
+*/
+public interface SpaceUserMapper extends BaseMapper<SpaceUser> {
+
+}
+
+
+
+

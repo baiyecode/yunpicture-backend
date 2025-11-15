@@ -1,0 +1,80 @@
+package com.baiye.yupicturebackend.service;
+
+import com.baiye.yupicturebackend.model.dto.space.analyze.*;
+import com.baiye.yupicturebackend.model.vo.space.analyze.*;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baiye.yupicturebackend.model.entity.Space;
+import com.baiye.yupicturebackend.model.entity.User;
+
+
+import java.util.List;
+
+/**
+ * ClassName: SpaceAnalyzeService
+ * Package: com.baiye.yupicturebackend.service
+ * Description:
+ *
+ * @Author 白夜
+ * @Create 2025/10/27 15:41
+ * @Version 1.0
+ */
+
+public interface SpaceAnalyzeService extends IService<Space> {
+
+
+    /**
+     * 获取空间使用情况分析
+     *
+     * @param spaceUsageAnalyzeRequest
+     * @param loginUser
+     * @return
+     */
+    SpaceUsageAnalyzeResponse getSpaceUsageAnalyze(SpaceUsageAnalyzeRequest spaceUsageAnalyzeRequest, User loginUser);
+
+    /**
+     * 获取空间图片分类情况分析
+     *
+     * @param spaceCategoryAnalyzeRequest
+     * @param loginUser
+     * @return
+     */
+    List<SpaceCategoryAnalyzeResponse> getSpaceCategoryAnalyze(SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, User loginUser);
+
+
+    /**
+     * 获取空间图片标签情况分析
+     *
+     * @param spaceTagAnalyzeRequest
+     * @param loginUser
+     * @return
+     */
+    List<SpaceTagAnalyzeResponse> getSpaceTagAnalyze(SpaceTagAnalyzeRequest spaceTagAnalyzeRequest, User loginUser);
+
+
+    /**
+     * 获取空间图片大小情况分析
+     *
+     * @param spaceSizeAnalyzeRequest
+     * @param loginUser
+     * @return
+     */
+    List<SpaceSizeAnalyzeResponse> getSpaceSizeAnalyze(SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest, User loginUser);
+
+    /**
+     * 获取空间用户上传行为分析
+     *
+     * @param spaceUserAnalyzeRequest
+     * @param loginUser
+     * @return
+     */
+    List<SpaceUserAnalyzeResponse> getSpaceUserAnalyze(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, User loginUser);
+
+    /**
+     * 空间使用排行分析（管理员）
+     *
+     * @param spaceRankAnalyzeRequest
+     * @param loginUser
+     * @return
+     */
+    List<Space> getSpaceRankAnalyze(SpaceRankAnalyzeRequest spaceRankAnalyzeRequest, User loginUser);
+}
