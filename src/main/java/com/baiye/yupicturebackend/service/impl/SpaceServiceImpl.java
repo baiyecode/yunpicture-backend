@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +61,10 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
     //@Resource
     //@Lazy
     //private DynamicShardingManager dynamicShardingManager;
+
+
+    //存储锁对象
+    private final Map<Long, Object> userLocks = new ConcurrentHashMap<>();
 
 
     /**
@@ -95,38 +100,47 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限创建指定级别的空间");
         }
         // 针对用户进行加锁,获取用户ID对应的字符串，并使用intern()方法确保使用字符串常量池中的唯一引用
-        String lock = String.valueOf(userId).intern();
+        //String lock = String.valueOf(userId).intern();
+
+        // 获取或创建用户专属锁
+        Object lock = userLocks.computeIfAbsent(userId, k -> new Object());
+
         //控制同一用户只能创建一个私有空间，一个团队空间
         synchronized (lock) {  //针对特定用户进行加锁，防止同一用户并发创建空间
-            Long newSpaceId = transactionTemplate.execute(status -> {
-                boolean exists = this.lambdaQuery()
-                        .eq(Space::getUserId, userId)
-                        .eq(Space::getSpaceType, spaceAddRequest.getSpaceType())
-                        .exists();
-                ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "每个用户每类空间只能创建一个");
-                // 写入数据库
-                boolean result = this.save(space);
-                ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-                //用户在创建团队空间时，会默认作为空间的管理员
-                // 如果是团队空间，关联新增团队成员记录
-                if (SpaceTypeEnum.TEAM.getValue() == spaceAddRequest.getSpaceType()) {
-                    SpaceUser spaceUser = new SpaceUser();
-                    spaceUser.setSpaceId(space.getId());
-                    spaceUser.setUserId(userId);
-                    spaceUser.setSpaceRole(SpaceRoleEnum.ADMIN.getValue());
-                    result = spaceUserService.save(spaceUser);
-                    ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建团队成员记录失败");
-                }
-                // 创建空间对应的图片表
-                //创建分表（仅对团队空间生效），为方便部署，暂时不使用
-                //dynamicShardingManager.createSpacePictureTable(space);
-                // 返回新写入的数据 id
-                return space.getId();
+            try {
+                Long newSpaceId = transactionTemplate.execute(status -> {
+                    boolean exists = this.lambdaQuery()
+                            .eq(Space::getUserId, userId)
+                            .eq(Space::getSpaceType, spaceAddRequest.getSpaceType())
+                            .exists();
+                    ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "每个用户每类空间只能创建一个");
+                    // 写入数据库T
+                    boolean result = this.save(space);
+                    ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+                    //用户在创建团队空间时，会默认作为空间的管理员
+                    // 如果是团队空间，关联新增团队成员记录
+                    if (SpaceTypeEnum.TEAM.getValue() == spaceAddRequest.getSpaceType()) {
+                        SpaceUser spaceUser = new SpaceUser();
+                        spaceUser.setSpaceId(space.getId());
+                        spaceUser.setUserId(userId);
+                        spaceUser.setSpaceRole(SpaceRoleEnum.ADMIN.getValue());
+                        result = spaceUserService.save(spaceUser);
+                        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建团队成员记录失败");
+                    }
+                    // 创建空间对应的图片表
+                    //创建分表（仅对团队空间生效），为方便部署，暂时不使用
+                    //dynamicShardingManager.createSpacePictureTable(space);
+                    // 返回新写入的数据 id
+                    return space.getId();
 
-            });
-            // 返回结果是包装类，可以做一些处理
-            //使用Optional处理可能为null的结果,如果newSpaceId为null，返回-1L作为错误标识
-            return Optional.ofNullable(newSpaceId).orElse(-1L);
+                });
+                // 返回结果是包装类，可以做一些处理
+                //使用Optional处理可能为null的结果,如果newSpaceId为null，返回-1L作为错误标识
+                return Optional.ofNullable(newSpaceId).orElse(-1L);
+            } finally {
+                //删除用户锁,防止内存泄漏
+                userLocks.remove(userId);
+            }
         }
     }
 
